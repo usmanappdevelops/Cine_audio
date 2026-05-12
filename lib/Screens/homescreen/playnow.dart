@@ -1,5 +1,9 @@
+// ignore_for_file: file_names
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cine_audio/Screens/detailscreen.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class Playnow extends StatefulWidget {
   const Playnow({super.key});
@@ -10,16 +14,58 @@ class Playnow extends StatefulWidget {
 
 class _PlaynowState extends State<Playnow> {
   double currentValue = 15.2;
+
+  /// 🔹 Comment Controller
+  final TextEditingController commentController = TextEditingController();
+
+  /// 🔹 Firestore
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  /// 🔹 Add Comment to Firebase
+  Future<void> addComment() async {
+    if (commentController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Please write a comment")));
+      return;
+    }
+
+    try {
+      await firestore.collection("comments").add({
+        "name": "John Doe",
+        "comment": commentController.text.trim(),
+        "image": "https://i.pravatar.cc/150?img=3",
+        "createdAt": Timestamp.now(),
+      });
+
+      commentController.clear();
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Error: $e")));
+    }
+  }
+
+  @override
+  void dispose() {
+    commentController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xff0d0d0d),
+      backgroundColor: const Color(0xff0d0d0d),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
+              /// 🔹 Top Bar
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -32,7 +78,7 @@ class _PlaynowState extends State<Playnow> {
                           ),
                         );
                       },
-                      icon: Icon(
+                      icon: const Icon(
                         Icons.arrow_back_ios,
                         color: Color(0xffed2c67),
                       ),
@@ -40,7 +86,7 @@ class _PlaynowState extends State<Playnow> {
 
                     IconButton(
                       onPressed: () {},
-                      icon: Icon(
+                      icon: const Icon(
                         Icons.favorite_border,
                         color: Color(0xffed2c67),
                       ),
@@ -51,18 +97,18 @@ class _PlaynowState extends State<Playnow> {
               Padding(
                 padding: const EdgeInsets.all(33),
                 child: Container(
-                  padding: EdgeInsets.all(3.36), // 👈 border thickness
+                  padding: const EdgeInsets.all(3.36),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
+                    gradient: const LinearGradient(
                       colors: [Color(0xffED2C67), Color(0xff4a1022)],
                     ),
                     borderRadius: BorderRadius.circular(43.69),
                   ),
                   child: Container(
                     width: 369,
-                    height: 495,
+                    height: 445,
                     decoration: BoxDecoration(
-                      color: Color(0xff0d0d0d),
+                      color: const Color(0xff0d0d0d),
                       borderRadius: BorderRadius.circular(43.69),
                     ),
                     child: Column(
@@ -71,33 +117,41 @@ class _PlaynowState extends State<Playnow> {
                           padding: const EdgeInsets.only(left: 200, top: 15),
                           child: IconButton(
                             onPressed: () {},
-                            icon: Icon(Icons.more_vert_rounded, size: 33),
+                            icon: const Icon(
+                              Icons.more_vert_rounded,
+                              size: 33,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
-                        CircleAvatar(
-                          radius: 72.5,
-                          backgroundColor: Color(0xffed2c67),
 
+                        const CircleAvatar(
+                          radius: 65,
+                          backgroundColor: Color(0xffed2c67),
                           child: CircleAvatar(
-                            radius: 71.5,
+                            radius: 64,
                             backgroundImage: AssetImage(
                               'assets/images/podcast.png',
                             ),
                           ),
                         ),
-                        SizedBox(height: 25),
-                        Text(
+
+                        const SizedBox(height: 20),
+
+                        const Text(
                           'Sunday Podcast',
                           style: TextStyle(
-                            color: Color(0xffffffff),
+                            color: Colors.white,
                             fontSize: 22,
-                            fontWeight: FontWeight(600),
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                        SizedBox(height: 30),
+
+                        const SizedBox(height: 20),
+
                         Slider(
-                          activeColor: Color(0xffed2c67),
-                          inactiveColor: Color(0xff736d6d),
+                          activeColor: const Color(0xffed2c67),
+                          inactiveColor: const Color(0xff736d6d),
                           value: currentValue,
                           min: 0,
                           max: 90,
@@ -107,34 +161,40 @@ class _PlaynowState extends State<Playnow> {
                             });
                           },
                         ),
-                        SizedBox(height: 10),
+
+                        const SizedBox(height: 10),
+
                         Padding(
-                          padding: const EdgeInsets.only(left: 17, right: 17),
+                          padding: const EdgeInsets.symmetric(horizontal: 17),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                '$currentValue',
-                                style: TextStyle(color: Color(0xff736D6D)),
+                                currentValue.toStringAsFixed(2),
+                                style: const TextStyle(
+                                  color: Color(0xff736D6D),
+                                ),
                               ),
-                              Text(
-                                '1hr 30m',
+                              const Text(
+                                '90 minutes',
                                 style: TextStyle(color: Color(0xff736D6D)),
                               ),
                             ],
                           ),
                         ),
+
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Image(
+                            const Image(
                               image: AssetImage('assets/images/playback.png'),
                               width: 24.22,
                               height: 23.63,
                             ),
+
                             Padding(
                               padding: const EdgeInsets.all(10),
-                              child: Image(
+                              child: const Image(
                                 image: AssetImage(
                                   'assets/images/Stop_fill.png',
                                 ),
@@ -143,241 +203,190 @@ class _PlaynowState extends State<Playnow> {
                               ),
                             ),
 
-                            Image(
+                            const Image(
                               image: AssetImage('assets/images/play.png'),
                               width: 24.22,
                               height: 23.63,
                             ),
                           ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15),
-                          child: Row(
-                            children: [
-                              Image(
-                                image: AssetImage('assets/images/Group 22.png'),
-                                width: 20,
-                                height: 20,
-                              ),
-                              Padding(
-                                padding: EdgeInsetsGeometry.only(left: 175),
-                                child: Icon(
-                                  Icons.power_settings_new,
-                                  color: Color(0xffed2c67),
-                                  weight: 24,
-                                  size: 24,
-                                ),
-                              ),
-                              SizedBox(width: 5),
-                              Icon(
-                                Icons.arrow_outward_outlined,
-                                color: Color(0xffed2c67),
-                                size: 24,
-                                weight: 24,
-                              ),
-                            ],
-                          ),
-                        ),
                       ],
                     ),
                   ),
                 ),
               ),
-              SizedBox(height: 10),
+
+              /// 🔹 Comments Heading
               Padding(
                 padding: const EdgeInsets.only(left: 45),
                 child: Row(
-                  children: [
+                  children: const [
                     Text(
-                      'Comments',
+                      'Comments ',
                       style: TextStyle(
-                        color: Color(0xffffffff),
+                        color: Colors.white,
                         fontSize: 16,
-                        fontWeight: FontWeight(600),
-                      ),
-                    ),
-                    Text(
-                      '(344)',
-                      style: TextStyle(
-                        color: Color(0xffed2c67),
-                        fontSize: 16,
-                        fontWeight: FontWeight(600),
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 10),
+
+              const SizedBox(height: 15),
+
+              /// 🔹 Comments Section
               Container(
-                width: 300,
-                height: 600,
+                width: 340,
                 decoration: BoxDecoration(
-                  color: Color(0xff242424),
+                  color: const Color(0xff242424),
                   borderRadius: BorderRadius.circular(11),
                 ),
                 child: Column(
                   children: [
-                    Column(
-                      children: [
-                        ListTile(
-                          leading: CircleAvatar(
-                            radius: 22.5,
-                            backgroundImage: AssetImage(
-                              'assets/images/boy.png',
-                            ),
-                          ),
-                          title: Text(
-                            'John Doe',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight(600),
-                              color: Color(0xffcdcdcb),
-                            ),
-                          ),
-                          subtitle: Text(
-                            '12-05-2023     12:34 P.M',
-                            style: TextStyle(
+                    /// 🔹 Comments List from Firebase
+                    StreamBuilder<QuerySnapshot>(
+                      stream: firestore
+                          .collection("comments")
+                          .orderBy("createdAt", descending: true)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Padding(
+                            padding: EdgeInsets.all(20),
+                            child: CircularProgressIndicator(
                               color: Color(0xffed2c67),
-                              fontSize: 11.52,
-                              fontWeight: FontWeight(400),
                             ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20),
-                          child: Text(
-                            'Lorem ipsum dolor sit amet consectetur. Egestas netus ultrices.Lorem ipsum dolor sit amet consectetur. Egestas.',
-                            style: TextStyle(
-                              color: Color(0xffffffff),
-                              fontSize: 14,
-                              fontWeight: FontWeight(400),
+                          );
+                        }
+
+                        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                          return const Padding(
+                            padding: EdgeInsets.all(20),
+                            child: Text(
+                              "No Comments Yet",
+                              style: TextStyle(color: Colors.white),
                             ),
-                          ),
-                        ),
-                      ],
+                          );
+                        }
+
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: snapshot.data!.docs.length,
+                          itemBuilder: (context, index) {
+                            final data = snapshot.data!.docs[index];
+
+                            Timestamp timestamp = data['createdAt'];
+
+                            DateTime date = timestamp.toDate();
+
+                            String formattedDate = DateFormat(
+                              'dd-MM-yyyy   hh:mm a',
+                            ).format(date);
+
+                            return Column(
+                              children: [
+                                ListTile(
+                                  leading: CircleAvatar(
+                                    radius: 22.5,
+                                    backgroundImage: NetworkImage(
+                                      data['image'],
+                                    ),
+                                  ),
+
+                                  title: Text(
+                                    data['name'],
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xffcdcdcb),
+                                    ),
+                                  ),
+
+                                  subtitle: Text(
+                                    formattedDate,
+                                    style: const TextStyle(
+                                      color: Color(0xffed2c67),
+                                      fontSize: 11.52,
+                                    ),
+                                  ),
+                                ),
+
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    left: 20,
+                                    right: 20,
+                                    bottom: 15,
+                                  ),
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      data['comment'],
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                                const Divider(color: Color(0xff2f2f2f)),
+                              ],
+                            );
+                          },
+                        );
+                      },
                     ),
-                    SizedBox(height: 20),
-                    Divider(height: 1, color: Color(0xff272727)),
-                    SizedBox(height: 10),
-                    Column(
-                      children: [
-                        ListTile(
-                          leading: CircleAvatar(
-                            radius: 22.5,
-                            backgroundImage: AssetImage(
-                              'assets/images/girl.png',
-                            ),
-                          ),
-                          title: Text(
-                            'John Doe',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight(600),
-                              color: Color(0xffcdcdcb),
-                            ),
-                          ),
-                          subtitle: Text(
-                            '12-05-2023     12:34 P.M',
-                            style: TextStyle(
-                              color: Color(0xffed2c67),
-                              fontSize: 11.52,
-                              fontWeight: FontWeight(400),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20),
-                          child: Text(
-                            'Lorem ipsum dolor sit amet consectetur. Egestas netus ultrices.Lorem ipsum dolor sit amet consectetur. Egestas.',
-                            style: TextStyle(
-                              color: Color(0xffffffff),
-                              fontSize: 14,
-                              fontWeight: FontWeight(400),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 20),
-                    Divider(height: 1, color: Color(0xff272727)),
-                    SizedBox(height: 10),
-                    Column(
-                      children: [
-                        ListTile(
-                          leading: CircleAvatar(
-                            radius: 22.5,
-                            backgroundImage: AssetImage(
-                              'assets/images/girl.png',
-                            ),
-                          ),
-                          title: Text(
-                            'John Doe',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight(600),
-                              color: Color(0xffcdcdcb),
-                            ),
-                          ),
-                          subtitle: Text(
-                            '12-05-2023     12:34 P.M',
-                            style: TextStyle(
-                              color: Color(0xffed2c67),
-                              fontSize: 11.52,
-                              fontWeight: FontWeight(400),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 20),
-                          child: Text(
-                            'Lorem ipsum dolor sit amet consectetur. Egestas netus ultrices.Lorem ipsum dolor sit amet consectetur. Egestas.',
-                            style: TextStyle(
-                              color: Color(0xffffffff),
-                              fontSize: 14,
-                              fontWeight: FontWeight(400),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 20),
-                    Divider(height: 1, color: Color(0xff272727)),
-                    SizedBox(height: 10),
+
+                    /// 🔹 Comment TextField
                     Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: TextField(
-                        style: TextStyle(color: Color(0xffffffff)),
-                        cursorColor: Color(0xffed2c67),
+                        controller: commentController,
+                        style: const TextStyle(color: Colors.white),
+                        cursorColor: const Color(0xffed2c67),
                         decoration: InputDecoration(
-                          focusColor: Color(0xffed2c67),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: Color(0xff2f2f2f)),
+                            borderSide: const BorderSide(
+                              color: Color(0xff2f2f2f),
+                            ),
                           ),
+
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(
+                            borderSide: const BorderSide(
                               color: Color(0xffed2c67),
                               width: 2,
                             ),
                           ),
-                          hintText: 'Write a Comment....', // Hint message
+
+                          hintText: 'Write a Comment....',
+
+                          hintStyle: const TextStyle(color: Colors.grey),
+
                           suffixIcon: IconButton(
-                            onPressed: () {},
-                            icon: Icon(
-                              Icons.arrow_outward,
+                            onPressed: () async {
+                              await addComment();
+                            },
+                            icon: const Icon(
+                              Icons.send,
                               color: Color(0xffed2c67),
                             ),
                           ),
+
                           filled: true,
-                          fillColor: Color(0xff2f2f2f), // Icon on the left
+                          fillColor: const Color(0xff2f2f2f),
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 10),
+
+              const SizedBox(height: 20),
             ],
           ),
         ),

@@ -1,3 +1,6 @@
+// ignore_for_file: file_names
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cine_audio/Screens/profile/Subscriptions.dart';
 import 'package:cine_audio/Screens/profile/dialog.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +13,7 @@ class Detailsubscription extends StatefulWidget {
 }
 
 class _DetailsubscriptionState extends State<Detailsubscription> {
-  // Controllers
+  // 🔹 Controllers
   final TextEditingController nameController = TextEditingController();
   final TextEditingController numberController = TextEditingController();
   final TextEditingController cnicController = TextEditingController();
@@ -18,9 +21,14 @@ class _DetailsubscriptionState extends State<Detailsubscription> {
   final TextEditingController bankController = TextEditingController();
   final TextEditingController cvvController = TextEditingController();
 
+  // 🔹 Loading
+  bool isLoading = false;
+
+  // 🔹 Firebase Firestore
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
   @override
   void dispose() {
-    // Dispose controllers
     nameController.dispose();
     numberController.dispose();
     cnicController.dispose();
@@ -28,6 +36,51 @@ class _DetailsubscriptionState extends State<Detailsubscription> {
     bankController.dispose();
     cvvController.dispose();
     super.dispose();
+  }
+
+  /// 🔹 Store Payment Details in Firebase
+  Future<void> saveSubscriptionDetails() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      await firestore.collection("subscription_details").add({
+        "name": nameController.text.trim(),
+        "phoneNumber": numberController.text.trim(),
+        "cnic": cnicController.text.trim(),
+        "cardNumber": cardController.text.trim(),
+        "bankName": bankController.text.trim(),
+        "cvv": cvvController.text.trim(),
+        "createdAt": Timestamp.now(),
+      });
+
+      setState(() {
+        isLoading = false;
+      });
+
+      // 🔹 Success Message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Payment Details Saved Successfully"),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      // 🔹 Success Dialog
+      showSuccessDialog(context);
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -39,7 +92,7 @@ class _DetailsubscriptionState extends State<Detailsubscription> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Top Bar
+              /// 🔹 Top Bar
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
@@ -84,7 +137,7 @@ class _DetailsubscriptionState extends State<Detailsubscription> {
 
               const SizedBox(height: 30),
 
-              // Selected Plan
+              /// 🔹 Selected Plan Card
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 17),
                 child: Container(
@@ -124,7 +177,6 @@ class _DetailsubscriptionState extends State<Detailsubscription> {
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 12,
-                                    fontWeight: FontWeight.w400,
                                   ),
                                 ),
                                 Text(
@@ -132,7 +184,6 @@ class _DetailsubscriptionState extends State<Detailsubscription> {
                                   style: TextStyle(
                                     color: Color(0xffed2c67),
                                     fontSize: 12,
-                                    fontWeight: FontWeight.w400,
                                   ),
                                 ),
                               ],
@@ -144,7 +195,6 @@ class _DetailsubscriptionState extends State<Detailsubscription> {
                           'Lorem ipsum dolor sit amet consectetur Egestas netus ultrices.',
                           style: TextStyle(
                             fontSize: 12,
-                            fontWeight: FontWeight.w400,
                             color: Color(0xff666666),
                           ),
                         ),
@@ -156,7 +206,7 @@ class _DetailsubscriptionState extends State<Detailsubscription> {
 
               const SizedBox(height: 20),
 
-              // Section Title
+              /// 🔹 Enter Details Title
               const Padding(
                 padding: EdgeInsets.only(left: 17),
                 child: Text(
@@ -171,7 +221,7 @@ class _DetailsubscriptionState extends State<Detailsubscription> {
 
               const SizedBox(height: 15),
 
-              // Name
+              /// 🔹 Name
               _buildTextField(
                 controller: nameController,
                 hint: 'Enter your name',
@@ -179,31 +229,34 @@ class _DetailsubscriptionState extends State<Detailsubscription> {
 
               const SizedBox(height: 15),
 
-              // Number
+              /// 🔹 Phone Number
               _buildTextField(
                 controller: numberController,
                 hint: 'Enter your Number',
+                keyboardType: TextInputType.phone,
               ),
 
               const SizedBox(height: 15),
 
-              // CNIC
+              /// 🔹 CNIC
               _buildTextField(
                 controller: cnicController,
-                hint: 'Enter your Cnic',
+                hint: 'Enter your CNIC',
+                keyboardType: TextInputType.number,
               ),
 
               const SizedBox(height: 15),
 
-              // Card Number
+              /// 🔹 Card Number
               _buildTextField(
                 controller: cardController,
                 hint: 'Enter card No.',
+                keyboardType: TextInputType.number,
               ),
 
               const SizedBox(height: 15),
 
-              // Bank Name & CVV
+              /// 🔹 Bank Name & CVV
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 17),
                 child: Row(
@@ -219,6 +272,7 @@ class _DetailsubscriptionState extends State<Detailsubscription> {
                       child: _buildTextField(
                         controller: cvvController,
                         hint: 'Enter CVV',
+                        keyboardType: TextInputType.number,
                       ),
                     ),
                   ],
@@ -227,47 +281,55 @@ class _DetailsubscriptionState extends State<Detailsubscription> {
 
               const SizedBox(height: 40),
 
-              // Pay Now Button
+              /// 🔹 Pay Now Button
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 17),
                 child: Container(
-                  height: 45,
+                  height: 50,
                   width: double.infinity,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [Color(0xffed2c67), Color(0xff3b0919)],
+                      colors: [
+                        Color(0xffed2c67),
+                        Color(0xff3b0919),
+                      ],
                     ),
                     borderRadius: BorderRadius.circular(11),
                   ),
-                  child: Center(
-                    child: TextButton(
-                      onPressed: () {
-                        if (nameController.text.isEmpty ||
-                            numberController.text.isEmpty ||
-                            cnicController.text.isEmpty ||
-                            cardController.text.isEmpty ||
-                            bankController.text.isEmpty ||
-                            cvvController.text.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Please fill all fields!'),
-                              backgroundColor: Color(0xff272727),
-                              duration: Duration(seconds: 2),
+                  child: TextButton(
+                    onPressed: isLoading
+                        ? null
+                        : () async {
+                            if (nameController.text.isEmpty ||
+                                numberController.text.isEmpty ||
+                                cnicController.text.isEmpty ||
+                                cardController.text.isEmpty ||
+                                bankController.text.isEmpty ||
+                                cvvController.text.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Please fill all fields!',
+                                  ),
+                                  backgroundColor: Color(0xff272727),
+                                ),
+                              );
+                            } else {
+                              await saveSubscriptionDetails();
+                            }
+                          },
+                    child: isLoading
+                        ? const CircularProgressIndicator(
+                            color: Colors.white,
+                          )
+                        : const Text(
+                            'Pay Now',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w400,
                             ),
-                          );
-                        } else {
-                          showSuccessDialog(context); // Success dialog
-                        }
-                      },
-                      child: const Text(
-                        'Pay Now',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ),
+                          ),
                   ),
                 ),
               ),
@@ -280,10 +342,11 @@ class _DetailsubscriptionState extends State<Detailsubscription> {
     );
   }
 
-  // Reusable TextField widget
+  /// 🔹 Reusable TextField Widget
   Widget _buildTextField({
     required TextEditingController controller,
     required String hint,
+    TextInputType keyboardType = TextInputType.text,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 17),
@@ -291,17 +354,25 @@ class _DetailsubscriptionState extends State<Detailsubscription> {
         height: 50,
         child: TextField(
           controller: controller,
+          keyboardType: keyboardType,
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: const TextStyle(color: Color(0xff949494)),
+            hintStyle: const TextStyle(
+              color: Color(0xff949494),
+            ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
-              borderSide: const BorderSide(color: Color(0xffed2c67)),
+              borderSide: const BorderSide(
+                color: Color(0xffed2c67),
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(15),
-              borderSide: const BorderSide(color: Color(0xffed2c67), width: 2),
+              borderSide: const BorderSide(
+                color: Color(0xffed2c67),
+                width: 2,
+              ),
             ),
           ),
         ),

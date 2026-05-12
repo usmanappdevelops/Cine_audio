@@ -37,6 +37,10 @@ dependencies:
   buttons_tabbar: 
   flutter_svg: 
   flutter_slidable: 
+  firebase_core:
+  cloud_firestore:
+  firebase_auth:
+  intl:
 dev_dependencies:
   flutter_test:
     sdk: flutter

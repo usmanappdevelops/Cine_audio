@@ -1,4 +1,4 @@
-
+import 'package:cine_audio/Screens/homescreen/bottombar.dart';
 import 'package:cine_audio/Screens/homescreen/playnow.dart';
 import 'package:flutter/material.dart';
 
@@ -32,7 +32,10 @@ class DetailScreen extends StatelessWidget {
                     left: 10,
                     child: IconButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => BottomBar()),
+                        );
                       },
                       icon: Icon(
                         Icons.arrow_back_ios_new,

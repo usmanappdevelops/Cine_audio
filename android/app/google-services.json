@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "604729523238",
+    "project_id": "cine-audio-1aaf1",
+    "storage_bucket": "cine-audio-1aaf1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:604729523238:android:1cf2f8f39e993bf09e7ae7",
+        "android_client_info": {
+          "package_name": "com.example.cine_audio"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC5a9GNyxthi_tW1r4P2U7BF8V2dYToYRs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
